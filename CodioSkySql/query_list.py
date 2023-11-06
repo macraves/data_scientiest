@@ -11,13 +11,13 @@ else:
 DELAY = 20
 
 QUERY_FLIGHT_BY_ID = """
-    SELECT flights.*, 
-    airlines.airline, 
-    flights.ID as FLIGHT_ID, 
-    flights.DEPARTURE_DELAY as DELAY 
-    FROM flights 
-    JOIN airlines ON flights.airline = airlines.id 
-    WHERE flights.ID = :id"""
+SELECT 
+	ar.AIRLINE as airline,
+	f.*  
+FROM flights as f
+JOIN airlines as ar
+ON f.airline = ar.id 
+WHERE f.ID = :id;"""
 
 QUERY_FLIGHT_BY_DATES = (
     "SELECT "
