@@ -8,6 +8,74 @@ import seaborn as sns
 import query_list as ql
 
 
+def scatter_heat_map_origin_destination(data_manager):
+    """Scatter plot of delayed flights by origin and destination
+    Uses pd read_sql_query to read data from a database to calculate departure delays
+    as a percentage of total departure delays and plot it on a scatter plot"""
+
+    query = ql.ORIGIN_DESTINATION_TOTAL_FLIGHTS_DEPARTURE_AND_ARRIVAL_DELAYS
+    records = data_manager.execute_bonus_query(query)
+    df = pd.DataFrame(records)
+    df["delay_percentage"] = round(
+        ((df["departure_delays"] / 60) / df["total_flights"]) * 100, 2
+    )
+    origin = df["origin"]
+    destination = df["destination"]
+    delay_percentage = df["delay_percentage"]
+
+    # Customizing scatter plot
+    norm = Normalize(vmin=min(delay_percentage), vmax=max(delay_percentage))
+    cmap = cm.get_cmap("Reds")
+    s = delay_percentage * 1
+
+    sc = plt.scatter(
+        origin,
+        destination,
+        c=delay_percentage,
+        s=s,  # Marker size is delay_percentage * 1
+        edgecolor="black",
+        linewidths=1,
+        cmap=cmap,
+        norm=norm,
+    )
+
+    cbar = plt.colorbar(sc, format="%.1f")
+    cbar.set_label("Percentage of delayed")
+    plt.title("Percentage of delayed on a heatmap of routes (Origin <-> Destination)")
+    plt.xticks(rotation=90)
+    plt.tight_layout()
+    plt.grid(True)
+    plt.show()
+
+
+def heat_map_origin_destination(data_manager):
+    """Plots heatmap of total departure delays by origin and destination
+    Uses pd read_sql_query to read data from database to calculate departure delays
+    then calculates percentage of total departure delays by origin and destination
+    to represent weighted heatmap of total departure delays origin and destination"""
+
+    query = ql.ORIGIN_DESTINATION_TOTAL_FLIGHTS_DEPARTURE_AND_ARRIVAL_DELAYS
+    results = data_manager.execute_bonus_query(query)
+    df = pd.DataFrame(results)
+    # Adding new column to dataframe as 'delay_percentage' where minutes
+    # converted to hours and divided by total flights then multiplied by 100
+    df["delay_percentage"] = round(
+        ((df["departure_delays"] / 60) / df["total_flights"]) * 100, 2
+    )
+    # Pivot table to create heatmap data
+    heatmap_data = df.pivot(
+        index="origin", columns="destination", values="delay_percentage"
+    )
+
+    plt.figure(figsize=(12, 8))
+    plt.title("Percentage of delayed on a heatmap of routes (Origin <-> Destination)")
+    sns.heatmap(
+        heatmap_data, cmap="YlOrRd", linewidths=0.5, linecolor="black", cbar=True
+    )
+
+    plt.show()
+
+
 def plot_total_delayed_flights_by_origin(delayed_origin_flights, origin):
     """Plot delayed flights by origin, where creates frequency of delayed flights of airlines
     and plot it by bar chart"""
@@ -93,72 +161,4 @@ def plot_percentage_of_delayed_flight_per_hour_of_the_day(data):
     plt.title("Percentage of Delayed Flights by Hour Day")
     plt.grid(True)
     plt.tight_layout()
-    plt.show()
-
-
-def scatter_heat_map_origin_destination(data_manager):
-    """Scatter plot of delayed flights by origin and destination
-    Uses pd read_sql_query to read data from a database to calculate departure delays
-    as a percentage of total departure delays and plot it on a scatter plot"""
-
-    query = ql.ORIGIN_DESTINATION_TOTAL_FLIGHTS_DEPARTURE_AND_ARRIVAL_DELAYS
-    records = data_manager.execute_bonus_query(query)
-    df = pd.DataFrame(records)
-    df["delay_percentage"] = round(
-        ((df["departure_delays"] / 60) / df["total_flights"]) * 100, 2
-    )
-    origin = df["origin"]
-    destination = df["destination"]
-    delay_percentage = df["delay_percentage"]
-
-    # Customizing scatter plot
-    norm = Normalize(vmin=min(delay_percentage), vmax=max(delay_percentage))
-    cmap = cm.get_cmap("Reds")
-    s = delay_percentage * 1
-
-    sc = plt.scatter(
-        origin,
-        destination,
-        c=delay_percentage,
-        s=s,  # Marker size is delay_percentage * 1
-        edgecolor="black",
-        linewidths=1,
-        cmap=cmap,
-        norm=norm,
-    )
-
-    cbar = plt.colorbar(sc, format="%.1f")
-    cbar.set_label("Percentage of delayed")
-    plt.title("Percentage of delayed on a heatmap of routes (Origin <-> Destination)")
-    plt.xticks(rotation=90)
-    plt.tight_layout()
-    plt.grid(True)
-    plt.show()
-
-
-def heat_map_origin_destination(data_manager):
-    """Plots heatmap of total departure delays by origin and destination
-    Uses pd read_sql_query to read data from database to calculate departure delays
-    then calculates percentage of total departure delays by origin and destination
-    to represent weighted heatmap of total departure delays origin and destination"""
-
-    query = ql.ORIGIN_DESTINATION_TOTAL_FLIGHTS_DEPARTURE_AND_ARRIVAL_DELAYS
-    results = data_manager.execute_bonus_query(query)
-    df = pd.DataFrame(results)
-    # Adding new column to dataframe as 'delay_percentage' where minutes
-    # converted to hours and divided by total flights then multiplied by 100
-    df["delay_percentage"] = round(
-        ((df["departure_delays"] / 60) / df["total_flights"]) * 100, 2
-    )
-    # Pivot table to create heatmap data
-    heatmap_data = df.pivot(
-        index="origin", columns="destination", values="delay_percentage"
-    )
-
-    plt.figure(figsize=(12, 8))
-    plt.title("Percentage of delayed on a heatmap of routes (Origin <-> Destination)")
-    sns.heatmap(
-        heatmap_data, cmap="YlOrRd", linewidths=0.5, linecolor="black", cbar=True
-    )
-
     plt.show()
