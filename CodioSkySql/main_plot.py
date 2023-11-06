@@ -1,5 +1,5 @@
 """Plotting functions for flights data"""
-from sqlalchemy import create_engine
+
 from matplotlib.colors import Normalize
 from matplotlib import cm
 import pandas as pd
@@ -54,7 +54,7 @@ def plot_percentage_of_delayed_flight_per_airline(data):
     total_flights_of_airline = [row[2] for row in data]
 
     delayed_percentage = [
-        round((minutes / flights) * 100, 2)
+        round(((minutes // 60) / flights) * 100, 2)
         for minutes, flights in zip(total_delays_in_minutes, total_flights_of_airline)
     ]
 
@@ -102,7 +102,8 @@ def scatter_heat_map_origin_destination(data_manager):
     as a percentage of total departure delays and plot it on a scatter plot"""
 
     query = ql.ORIGIN_DESTINATION_TOTAL_FLIGHTS_DEPARTURE_AND_ARRIVAL_DELAYS
-    df = pd.read_sql_query(query, data_manager.execute_bonus_query(query))
+    records = data_manager.execute_bonus_query(query)
+    df = pd.DataFrame(records)
     df["delay_percentage"] = round(
         ((df["departure_delays"] / 60) / df["total_flights"]) * 100, 2
     )
@@ -142,7 +143,8 @@ def heat_map_origin_destination(data_manager):
     to represent weighted heatmap of total departure delays origin and destination"""
 
     query = ql.ORIGIN_DESTINATION_TOTAL_FLIGHTS_DEPARTURE_AND_ARRIVAL_DELAYS
-    df = pd.read_sql_query(query, data_manager.execute_bonus_query(query))
+    results = data_manager.execute_bonus_query(query)
+    df = pd.DataFrame(results)
     # Adding new column to dataframe as 'delay_percentage' where minutes
     # converted to hours and divided by total flights then multiplied by 100
     df["delay_percentage"] = round(

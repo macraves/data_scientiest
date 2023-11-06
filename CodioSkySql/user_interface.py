@@ -23,6 +23,7 @@ def user_menu():
     opening_scene = "Main function list:"
     main_functions = get_main_functions_name()
     main_func_len = len(main_functions)
+
     name_map = map(
         lambda x: f"{x[0]}: {x[1].replace('_', ' ')}", main_functions.items()
     )
@@ -35,7 +36,7 @@ def user_menu():
         command = io.read_int_ranged(
             menu + "Please enter a number: ", 1, main_func_len + 1
         )
-        if command == main_func_len + 2:
+        if command == main_func_len + 1:
             break
 
         nesne = FlightData(ql.DATABASE_URI)
@@ -43,4 +44,5 @@ def user_menu():
         print(getattr(main, func)(nesne))
 
 
-user_menu()
+if __name__ == "__main__":
+    user_menu()
