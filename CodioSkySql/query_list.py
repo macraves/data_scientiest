@@ -167,3 +167,16 @@ ON f.ORIGIN_AIRPORT = ar.IATA_CODE
 GROUP BY origin, destination, destination_lat, destination_long
 HAVING total_delays > {DELAY}
 ORDER BY origin, destination;"""
+
+INSERT_FLIGHT = """
+INSERT INTO flights 
+    (ID, airline, DEPARTURE_DELAY) VALUES (:id, :airline, :delay)"""
+
+UPDATE_FLIGHT = """
+    UPDATE flights 
+    SET airline = :airline, 
+    DEPARTURE_DELAY = :delay 
+    WHERE ID = :id
+"""
+
+DELETE_FLIGHT = "DELETE FROM flights WHERE ID = :id"

@@ -108,6 +108,29 @@ class FlightData:
             return self._execute_query(query, {})
         return self._execute_query(query, params)
 
+    def insert_flight_into_flights(self, flight):
+        """Method to insert flight into flights table"""
+        params = {
+            "id": flight["id"],
+            "airline": flight["airline"],
+            "delay": flight["delay"],
+        }
+        return self._execute_query(ql.INSERT_FLIGHT, params)
+
+    def update_flight(self, flight):
+        """Method to update flight into flights table"""
+        params = {
+            "id": flight["id"],
+            "airline": flight["airline"],
+            "delay": flight["delay"],
+        }
+        return self._execute_query(ql.UPDATE_FLIGHT, params)
+
+    def delete_flight(self, flight_id):
+        """Method to delete flight from flights table"""
+        params = {"id": flight_id}
+        return self._execute_query(ql.DELETE_FLIGHT, params)
+
     def __del__(self):
         """
         Closes the connection to the databse when the object is about to be destroyed
