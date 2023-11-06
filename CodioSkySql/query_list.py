@@ -135,3 +135,45 @@ SELECT
 	SUM(CASE WHEN f.ARRIVAL_DELAY >0 THEN f.ARRIVAL_DELAY ELSE 0 END) as arrival_delays
 FROM flights as f
 GROUP BY origin,destination;"""
+
+LOCATION_DESTINATION_TOTAL_FLIGHTS_DEPARTURE_DELAYS = """
+SELECT
+	f.ORIGIN_AIRPORT as origin,
+	ar.LATITUDE as origin_lat,
+	ar.LONGITUDE as origin_long,
+	count(*) as total_flights,
+	sum(case WHEN f.DEPARTURE_DELAY > 0 THEN f.DEPARTURE_DELAY ELSE 0 END) as total_delays,
+	f.DESTINATION_AIRPORT as destination,
+	air.LATITUDE as destination_lat,
+	air.LONGITUDE as destination_long
+FROM
+	flights as f
+JOIN airports as ar
+ON f.ORIGIN_AIRPORT = ar.IATA_CODE
+JOIN airports as air
+ON f.DESTINATION_AIRPORT = air.IATA_CODE
+WHERE f.ORIGIN_AIRPORT = :origin
+GROUP BY origin, destination
+HAVING total_delays > 60 -- filters more than 10 minutes delays
+ORDER BY origin, destination --total_delays;"""
+
+
+LOCATION_DESTINATION_TOTAL_FLIGHTS = """
+SELECT
+    f.ORIGIN_AIRPORT as origin,
+    ar.LATITUDE,
+    ar.LONGITUDE,
+    f.DESTINATION_AIRPORT as destination,
+    (SELECT LATITUDE FROM airports WHERE IATA_CODE = f.DESTINATION_AIRPORT) as destination_lat,
+    (SELECT LONGITUDE FROM airports WHERE IATA_CODE = f.DESTINATION_AIRPORT) as destination_long,
+    count(*) as total_flights,
+    sum(case WHEN f.DEPARTURE_DELAY > 0 THEN f.DEPARTURE_DELAY ELSE 0 END) as total_delays
+FROM
+    flights as f
+JOIN airports as ar
+ON f.ORIGIN_AIRPORT = ar.IATA_CODE
+GROUP BY origin, destination, destination_lat, destination_long
+HAVING total_delays > 10
+ORDER BY origin, destination;"""
+
+"""ATL	33.64044	-84.42694	775	7410.0	AUS	30.19453	-97.66987"""

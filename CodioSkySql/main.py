@@ -60,6 +60,11 @@ def show_heat_map_of_delayed_flights_by_airline(data_manager):
     return "Plot is shown"
 
 
+def show_percentage_of_delayed_flights_per_route_on_map(data_manager):
+    """Displays percentage of delayed flights per route on map"""
+    return mp.percentage_of_delayed_flights_per_route_on_map(data_manager)
+
+
 def print_flight_by_id(data_manager):
     """
     Asks the user for a numeric flight ID,

@@ -1,9 +1,4 @@
-"""Methods for accessing flight data from the database.
-1. Show flight by ID
-2. Show flights by date
-3. Delayed flights by airline
-4. Delayed flights by origin airport
-5. Exit"""
+"""Methods for accessing flight data from the database."""
 
 from contextlib import closing
 from sqlalchemy import create_engine, text, exc
@@ -106,9 +101,12 @@ class FlightData:
             ql.ORIGIN_DESTINATION_TOTAL_FLIGHTS_DEPARTURE_AND_ARRIVAL_DELAYS, {}
         )
 
-    def execute_bonus_query(self, query):
+    def execute_bonus_query(self, query, params=None):
         """Method to execute bonus query"""
-        return self._execute_query(query, {})
+        if params is None:
+            params = {}
+            return self._execute_query(query, {})
+        return self._execute_query(query, params)
 
     def __del__(self):
         """

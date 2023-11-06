@@ -6,6 +6,76 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import query_list as ql
+import folium
+from branca.colormap import LinearColormap
+
+
+def percentage_of_delayed_flights_per_route_on_map(data_manager):
+    """Plots percentage of delayed flights per route on map"""
+    while True:
+        origin = input("Enter origin airport: ")
+        origin = origin.upper().strip()
+        if not len(origin) == 3:
+            print("Please enter a valid airport code")
+            continue
+        break
+    m = folium.Map(location=[30.19453, -97.66987], zoom_start=4)
+    params = {"origin": origin}
+    query = ql.LOCATION_DESTINATION_TOTAL_FLIGHTS_DEPARTURE_DELAYS
+    results = data_manager.execute_bonus_query(query, params)
+    df = pd.DataFrame(results)
+    df["delays_percentage"] = round(
+        ((df["total_delays"] // 60) / df["total_flights"]) * 100, 2
+    )
+    df["origin"] = df["origin"].astype(str)
+    df["destination"] = df["destination"].astype(str)
+    df["delays_percentage"] = df["delays_percentage"].astype(float)
+
+    # Create a color map based on delays_percentage
+    color_map = LinearColormap(
+        ["yellow", "blue", "darkred"],
+        vmin=df["delays_percentage"].min(),
+        vmax=df["delays_percentage"].max(),
+    )
+    origin = df["origin"].iloc[0]
+    origin_lat = df["origin_lat"].iloc[0]
+    origin_long = df["origin_long"].iloc[0]
+    folium.Marker(
+        location=[origin_lat, origin_long],
+        tooltip=origin,
+        icon=folium.Icon(color="red", icon="plane", prefix="fa"),
+    ).add_to(m)
+
+    coordinates = []
+    for _, row in df.iterrows():
+        folium.Marker(
+            location=[row["destination_lat"], row["destination_long"]],
+            tooltip=row["destination"],
+            popup=f"Percentage of delayed flights: {row['delays_percentage']}%",
+            icon=folium.Icon(color="green", icon="plane", prefix="fa"),
+        ).add_to(m)
+        coordinates.append(
+            [
+                (float(row["origin_lat"]), float(row["origin_long"])),
+                (float(row["destination_lat"]), float(row["destination_long"])),
+            ]
+        )
+
+    for i, coord in enumerate(coordinates):
+        delay_percentage = df.loc[i, "delays_percentage"]
+        color = color_map(delay_percentage)
+
+        folium.PolyLine(
+            locations=coord,
+            color=color,
+            weight=8,
+            opacity=1,
+            smooth_factor=0,
+        ).add_to(m)
+
+    color_map.add_to(m)
+    m.save(f"{origin} overview.html")
+    return f"Map saved as {origin} overview.html"
 
 
 def scatter_heat_map_origin_destination(data_manager):
