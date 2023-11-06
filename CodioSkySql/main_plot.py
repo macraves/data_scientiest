@@ -43,7 +43,7 @@ def percentage_of_delayed_flights_per_route_on_map(data_manager):
     folium.Marker(
         location=[origin_lat, origin_long],
         tooltip=origin,
-        icon=folium.Icon(color="red", icon="plane", prefix="fa"),
+        icon=folium.Icon(color="green", icon="plane", prefix="fa"),
     ).add_to(m)
 
     coordinates = []
@@ -51,8 +51,9 @@ def percentage_of_delayed_flights_per_route_on_map(data_manager):
         folium.Marker(
             location=[row["destination_lat"], row["destination_long"]],
             tooltip=row["destination"],
-            popup=f"Percentage of delayed flights: {row['delays_percentage']}%",
-            icon=folium.Icon(color="green", icon="plane", prefix="fa"),
+            popup=f"""Percentage of delayed flights: {row['delays_percentage']}%
+            for total flights: {row['total_flights']}""",
+            icon=folium.Icon(color="red", icon="plane", prefix="fa"),
         ).add_to(m)
         coordinates.append(
             [
