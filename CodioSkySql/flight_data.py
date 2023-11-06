@@ -154,14 +154,17 @@ def print_delayed_flights_by_airline(data_manager):
             print("Invalid input. Please enter a valid airline.\n", val_err)
 
     # -- 2. JFK -> LAX by Virgin America, Delay: 28 Minutes
+    filtered_rows = filter(
+        lambda row: float(row[3]) > 20 if not row[3] == "" else 0, rows
+    )
     template = map(
         lambda x: f"""{x[0]}. {x[1]} -> LAX by {x[2]}, Delay: {x[3]} Minutes""",
-        rows,
+        filtered_rows,
     )
     return (
         "\n".join(template)
         + "\n"
-        + f"Total delayed flights: {len(rows)} that more than 60 minutes"
+        + f"Total delayed flights: {len(rows)} that more than 20 minutes"
     )
 
 

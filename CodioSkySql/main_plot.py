@@ -174,7 +174,8 @@ def scater_plot_of_delayed_flights_and_origins(data):
     time colored by given values as minutes"""
     origins = [row[0] for row in data]
     airlines = [row[1] for row in data]
-    delays = [row[2] for row in data]
+    delays = [int(row[2]) if row[2] != "" and row[2] > 20 else 0 for row in data]
+
     plt.scatter(origins, airlines, c=delays, cmap="viridis")
     plt.xlabel("Origin")
     plt.ylabel("Airline")
