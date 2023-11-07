@@ -104,12 +104,27 @@ def get_flights_by_date():
         return jsonify({"error": "Invalid date format. Use 'YYYY/MM/DD' format."}, 400)
 
 
+@app.route("/api/airline/delays/date", methods=["GET"])
+def delayed_airline_flights_by_date():
+    """Gets users year, month and day input and calls FlightData related method"""
+    try:
+        year = request.args.get("year")
+        month = request.args.get("month")
+        day = request.args.get("day")
+        date_str = f"{year}/{month}/{day}"
+        # Convert date string to a Python date object
+        # If format is wrong, ValueError exception will be raised
+        date = datetime.strptime(date_str, "%Y/%m/%d").date()
+        flights = FLIGHT_DATA.delayed_airline_flights_by_date(date)
+        if flights:
+            flights_frame = pd.DataFrame(flights)
+            flights_dict = flights_frame.to_dict(orient="records")
+            json_file = json.dumps(flights_dict, indent=4)
+            return jsonify(json.loads(json_file))
+        return jsonify({"error": "No flights found for the given date"}, 404)
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Use 'YYYY/MM/DD' format."}, 400)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
-
-# column_dict = {
-#     "ID": [653, 4543],
-#     "airport": ["JFK", "JFK"],
-#     "AIRLINE": ["American Airlines Inc.", "JetBlue Airways"],
-#     "DELAY": [21, 21],
-# }

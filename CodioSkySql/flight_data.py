@@ -86,18 +86,16 @@ def print_flight_by_id(data_manager):
     # none of the fetchall methods return a list of dictionary like object !!!
     list_fact = [
         {
-            "id": row[0],
-            "year": row[1],
-            "month": row[2],
-            "day": row[3],
-            "number": row[4],
-            "airline": row[5],
-            "flight no": row[6],
-            "tail no": row[7],
-            "origin": row[8],
-            "destination": row[9],
-            "scheduled departure": f"{row[10][:2]}:{row[10][2:]}",
-            "scheduled arrival": f"{row[21][:2]}:{row[11][2:]}",
+            "airline": row[0],
+            "id": row[1],
+            "year": row[2],
+            "month": row[3],
+            "day": row[4],
+            "tail no": row[8],
+            "origin": row[9],
+            "destination": row[10],
+            "scheduled departure": f"{row[11][:2]}:{row[11][2:]}",
+            "scheduled arrival": f"{row[22][:2]}:{row[11][2:]}",
         }
         for row in rows
     ]
@@ -155,7 +153,7 @@ def print_delayed_flights_by_airline(data_manager):
 
     # -- 2. JFK -> LAX by Virgin America, Delay: 28 Minutes
     filtered_rows = filter(
-        lambda row: float(row[3]) > 20 if not row[3] == "" else 0, rows
+        lambda row: (row[3] is not None and row[3] != "") and float(row[3]) > 20, rows
     )
     template = map(
         lambda x: f"""{x[0]}. {x[1]} -> LAX by {x[2]}, Delay: {x[3]} Minutes""",
@@ -179,7 +177,7 @@ def print_delayed_flights_by_origin(data_manager):
         if requested_origin.isalpha() and len(requested_origin) == IATA_LENGTH:
             valid = True
         rows = data_manager.get_delayed_flights_by_origin(requested_origin)
-        rows = [row for row in rows if row[3] > 2]  # 2 minutes delay is not delay
+        rows = [row for row in rows if row[3] > 20 and row[3] != ""]
         if not rows:
             print(f"No delayed flights found with {requested_origin}.")
             continue

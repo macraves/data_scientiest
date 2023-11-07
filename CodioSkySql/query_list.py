@@ -43,11 +43,10 @@ SELECT
 	al.AIRLINE as airline,
 	f.ORIGIN_AIRPORT as origin,
 	f.DEPARTURE_DELAY as delay
-	--(CASE WHEN f.DEPARTURE_DELAY > 0 THEN f.DEPARTURE_DELAY ELSE 0 END) as delay --does not work!
 FROM flights as f
 JOIN airlines as al
 ON f.AIRLINE = al.ID
-WHERE (DELAY > {DELAY} AND (DELAY IS NOT NULL AND DELAY != '')) AND al.AIRLINE = :airline
+WHERE (delay > {DELAY} AND (delay IS NOT NULL AND delay != '')) AND al.AIRLINE = :airline
 ORDER BY delay DESC;"""
 
 DELAYED_FLIGHTS_BY_ORIGIN = f"""
@@ -55,12 +54,12 @@ SELECT
 	f.ID,
 	f.ORIGIN_AIRPORT as airport,
 	al.AIRLINE,
-	f.DEPARTURE_DELAY as DELAY
+	f.DEPARTURE_DELAY as delay
 FROM flights as f
 JOIN airlines as al
 ON f.AIRLINE = al.ID
-WHERE airport = :origin AND (DELAY > {DELAY} AND (DELAY IS NOT NULL AND DELAY != ''))
-ORDER BY DELAY;"""
+WHERE airport = :origin AND (delay > {DELAY} AND (delay IS NOT NULL AND delay != ''))
+ORDER BY delay;"""
 
 DELAYED_AIRLINE_FLIGHTS_BY_DATE = f"""
 SELECT
@@ -82,13 +81,13 @@ SELECT
 	--fl.ID,
 	fl.ORIGIN_AIRPORT as ORIGIN,
 	al.AIRLINE,
-	fl.DEPARTURE_DELAY as DELAY
+	fl.DEPARTURE_DELAY as delay
 FROM flights as fl
 JOIN airports as ar
 ON fl.ORIGIN_AIRPORT = ar.IATA_CODE
 JOIN airlines as al
 ON fl.AIRLINE = al.ID
-WHERE (DELAY > {DELAY} AND (DELAY IS NOT NULL AND DELAY != ''))
+WHERE (delay > {DELAY} AND (delay IS NOT NULL AND delay != ''))
 GROUP BY al.AIRLINE, ORIGIN
 ORDER by ORIGIN;"""
 
@@ -131,8 +130,8 @@ SELECT
 	SUM(CASE WHEN f.ARRIVAL_DELAY >0 THEN f.ARRIVAL_DELAY ELSE 0 END) as arrival_delays
 FROM flights as f
 GROUP BY origin,destination
-HAVING departure_delays > {DELAY} AND (departure_delays IS NOT NULL AND departure_delays != '')) 
-OR arrival_delays > {DELAY} AND (arrival_delays IS NOT NULL AND arrival_delays !="") ;"""
+HAVING departure_delays > {DELAY}  AND arrival_delays > {DELAY}
+ORDER BY origin,destination;"""
 
 LOCATION_DESTINATION_TOTAL_FLIGHTS_DEPARTURE_DELAYS = f"""
 SELECT
