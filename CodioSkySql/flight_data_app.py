@@ -1,7 +1,7 @@
 """API Endpoints for flight data"""
 import json
 from datetime import datetime
-from data import FlightData
+from data import FlightData, CrudError
 import query_list as ql
 import pandas as pd
 from flask import jsonify, Flask, request
@@ -24,6 +24,19 @@ def get_flight_by_id(flight_id):
     # Convert to JSON object
     json_file = json.dumps(dict_fact, indent=4)
     return jsonify(json.loads(json_file))
+
+
+@app.route("/api/flights", methods=["POST"])
+def add_flight():
+    """JSON dictionary is sent to this endpoint and then it is added to the database"""
+    flight = request.get_json()
+    if all(key in flight for key in ("id", "airline", "delay")):
+        try:
+            FLIGHT_DATA.insert_flight_into_flights(flight)
+            return jsonify({"message": "Flight added successfully"}, 201)
+        except CrudError:
+            return jsonify({"error": "Failed to add the flight"}, 500)
+    return jsonify({"error": "Invalid data format. Use JSON."}, 400)
 
 
 @app.route("/api/flights", methods=["GET"])
@@ -51,9 +64,9 @@ def get_flights_by_date():
 if __name__ == "__main__":
     app.run(debug=True)
 
-column_dict = {
-    "ID": [653, 4543],
-    "airport": ["JFK", "JFK"],
-    "AIRLINE": ["American Airlines Inc.", "JetBlue Airways"],
-    "DELAY": [21, 21],
-}
+# column_dict = {
+#     "ID": [653, 4543],
+#     "airport": ["JFK", "JFK"],
+#     "AIRLINE": ["American Airlines Inc.", "JetBlue Airways"],
+#     "DELAY": [21, 21],
+# }

@@ -36,13 +36,22 @@ class FlightData:
             try:
                 query = text(query)
                 results = connection.execute(query, params)
-                # CRUD results return 0 rows
-                if results.rowcount == 0:
-                    return "CRUD results return 0 rows"
                 return results.fetchall()
-            except exc.SQLAlchemyError as e:
-                print("Error executing query: ", e)
+            except exc.SQLAlchemyError as query_error:
+                print("Error executing query: ", query_error)
                 return []
+
+    def _crud_queries(self, query, params):
+        """
+        Execute an SQL query with the params provided in a dictionary.
+        If an exception was raised, print the error.
+        """
+        with closing(self._engine.connect()) as connection:
+            try:
+                query = text(query)
+                connection.execute(query, params)
+            except exc.SQLAlchemyError as crud_error:
+                raise CrudError(f"Error executing query: {crud_error}")
 
     def get_flight_by_id(self, flight_id):
         """
@@ -125,7 +134,7 @@ class FlightData:
             "airline": flight["airline"],
             "delay": flight["delay"],
         }
-        return self._execute_query(ql.INSERT_FLIGHT, params)
+        self._crud_queries(ql.INSERT_FLIGHT, params)
 
     def update_flight(self, flight):
         """Method to update flight into flights table"""
@@ -134,12 +143,12 @@ class FlightData:
             "airline": flight["airline"],
             "delay": flight["delay"],
         }
-        return self._execute_query(ql.UPDATE_FLIGHT, params)
+        self._crud_queries(ql.UPDATE_FLIGHT, params)
 
     def delete_flight(self, flight_id):
         """Method to delete flight from flights table"""
         params = {"id": flight_id}
-        return self._execute_query(ql.DELETE_FLIGHT, params)
+        self._crud_queries(ql.DELETE_FLIGHT, params)
 
     def __del__(self):
         """
