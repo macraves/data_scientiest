@@ -34,16 +34,19 @@ QUERY_FLIGHT_BY_DATES = (
     "ON f.AIRLINE = a.ID "
     "WHERE f.YEAR = :year AND f.MONTH = :month AND f.DAY = :day "
 )
+# not elimate the Null values
 DELAYED_FLIGHTS_BY_AIRLINE = f"""
 SELECT
-	al.ID, f.ORIGIN_AIRPORT as origin,
-	al.AIRLINE,
+	al.AIRLINE as airline,
+	f.AIRLINE as airline_id,
+	f.ORIGIN_AIRPORT as origin,
 	f.DEPARTURE_DELAY as delay
+	--(CASE WHEN f.DEPARTURE_DELAY > 0 THEN f.DEPARTURE_DELAY ELSE 0 END) as delay --does not work!
 FROM flights as f
 JOIN airlines as al
 ON f.AIRLINE = al.ID
-WHERE al.AIRLINE = :airline AND delay > {DELAY}
-ORDER BY delay;"""
+WHERE delay is not NULL AND (al.AIRLINE = :airline AND delay > {DELAY})
+ORDER BY delay DESC;"""
 
 DELAYED_FLIGHTS_BY_ORIGIN = f"""
 SELECT 
