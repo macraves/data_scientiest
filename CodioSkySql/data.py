@@ -5,6 +5,13 @@ from sqlalchemy import create_engine, text, exc
 import query_list as ql
 
 
+class CrudError(Exception):
+    """Crud methods of sql if it is failed result varible can not retrun rows"""
+
+    def __init__(self, message):
+        self.message = message
+
+
 class FlightData:
     """
     The FlightData class is a Data Access Layer (DAL) object that provides an
@@ -28,7 +35,10 @@ class FlightData:
         with closing(self._engine.connect()) as connection:
             try:
                 query = text(query)
-                results = connection.execute(query, params)
+                try:
+                    results = connection.execute(query, params)
+                except CrudError as cr:
+                    raise CrudError("CRUD operation returns no rows ") from cr
                 return results.fetchall()
             except exc.SQLAlchemyError as e:
                 print("Error executing query: ", e)
