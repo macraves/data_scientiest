@@ -47,7 +47,6 @@ def update_flight(flight_id):
     """Sends endpoint and then it is updated in the database
     Current implementation does not allow to change the flight ID
     Need to add a check for that and find a method to check CRUD operation result"""
-    # Not working
     flight = request.get_json()
     does_exist = FLIGHT_DATA.find_flight_by_id(flight_id)
     if not does_exist:

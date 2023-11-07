@@ -14,3 +14,7 @@ For better presentation matplotlib and folium library are used.
 ### how to run
 
 Application kicks start from main.py. It is a generic file that reads functions of flight_data.py and creates a list of functions where the user can enter its command to run appropriate functions.
+
+### flask app backend
+
+Some certain FlightData instance methods are used for flask
