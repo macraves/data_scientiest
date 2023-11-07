@@ -35,10 +35,10 @@ class FlightData:
         with closing(self._engine.connect()) as connection:
             try:
                 query = text(query)
-                try:
-                    results = connection.execute(query, params)
-                except CrudError as cr:
-                    raise CrudError("CRUD operation returns no rows ") from cr
+                results = connection.execute(query, params)
+                # CRUD results return 0 rows
+                if results.rowcount == 0:
+                    return "CRUD results return 0 rows"
                 return results.fetchall()
             except exc.SQLAlchemyError as e:
                 print("Error executing query: ", e)
