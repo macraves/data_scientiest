@@ -50,8 +50,18 @@ class FlightData:
             try:
                 query = text(query)
                 connection.execute(query, params)
+                connection.commit()
             except exc.SQLAlchemyError as crud_error:
-                raise CrudError(f"Error executing query: {crud_error}")
+                raise CrudError(f"Error executing query: {crud_error}") from crud_error
+
+    def find_flight_by_id(self, flight_id):
+        """
+        Searches for flight details using flight ID.
+        If the flight was found, returns a list with a single record.
+        """
+
+        params = {"id": flight_id}
+        return self._execute_query(ql.FIND_FLIGHT_BY_ID, params)
 
     def get_flight_by_id(self, flight_id):
         """

@@ -10,6 +10,8 @@ else:
 
 DELAY = 20
 
+FIND_FLIGHT_BY_ID = """SELECT * FROM flights WHERE ID = :id;"""
+
 QUERY_FLIGHT_BY_ID = """
 SELECT 
 	ar.AIRLINE as airline,
@@ -37,8 +39,8 @@ QUERY_FLIGHT_BY_DATES = (
 # not elimate the Null values
 DELAYED_FLIGHTS_BY_AIRLINE = f"""
 SELECT
-	al.AIRLINE as airline,
 	f.AIRLINE as airline_id,
+	al.AIRLINE as airline,
 	f.ORIGIN_AIRPORT as origin,
 	f.DEPARTURE_DELAY as delay
 	--(CASE WHEN f.DEPARTURE_DELAY > 0 THEN f.DEPARTURE_DELAY ELSE 0 END) as delay --does not work!
